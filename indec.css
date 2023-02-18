@@ -1,0 +1,33 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(228, 219, 219);
+}
+
+#game-board {
+    width: 300px;
+    height: 300px;
+    border: 1px solid black;
+  }
+  
+  #game-board td {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid black;
+  }
+  
+  .x {
+    color: red;
+    font-size: 48px;
+  }
+  
+  .o {
+    color: blue;
+    font-size: 48px;
+  }
+  /* D:\RK_dir\python\python projects\tic tac too\indec.css */

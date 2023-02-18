@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./indec.css">
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+    <table id="game-board">
+        <tr>
+          <td id="0"></td>
+          <td id="1"></td>
+          <td id="2"></td>
+        </tr>
+        <tr>
+          <td id="3"></td>
+          <td id="4"></td>
+          <td id="5"></td>
+        </tr>
+        <tr>
+          <td id="6"></td>
+          <td id="7"></td>
+          <td id="8"></td>
+        </tr>
+      </table>
+      <script src="./index.js"></script>
+
+<py-script>
+from js import document
+from pyodide import create_proxy
+
+gameBoard = document.getElementById("game-board")
+cells = gameBoard.getElementsByTagName("td")
+
+board={0:" ", 1:" ", 2:" ",
+       3:" ", 4:" ", 5:" ",
+       6:" ", 7:" ", 8:" "}
+
+def spaceIsFree(position):
+    if (board[position]==' '):
+        return True
+    else:
+        return False
+
+def chkForWin():
+    if (board[1-1]==board[2-1] and board[1-1]==board[3-1] and board[1-1] !=' '):
+        return True
+    elif (board[4-1]==board[5-1] and board[4-1]==board[6-1] and board[4-1] !=' '):
+        return True
+    elif (board[7-1]==board[8-1] and board[7-1]==board[9-1] and board[7-1] !=' '):
+        return True
+    elif (board[1-1]==board[5-1] and board[1-1]==board[9-1] and board[1-1] !=' '):
+        return True
+    elif (board[3-1]==board[5-1] and board[3-1]==board[7-1] and board[3-1] !=' '):
+        return True
+    elif (board[1-1]==board[4-1] and board[1-1]==board[7-1] and board[1-1] !=' '):
+        return True
+    elif (board[2-1]==board[5-1] and board[2-1]==board[8-1] and board[2-1] !=' '):
+        return True
+    elif (board[3-1]==board[6-1] and board[3-1]==board[9-1] and board[3-1] !=' '):
+        return True
+    else:
+        return False
+
+def chkMarkForWin(mark):
+    if (board[1-1]==board[2-1] and board[1-1]==board[3-1] and board[1-1] ==mark):
+        return True
+    elif (board[4-1]==board[5-1] and board[4-1]==board[6-1] and board[4-1] ==mark):
+        return True
+    elif (board[7-1]==board[8-1] and board[7-1]==board[9-1] and board[7-1] ==mark):
+        return True
+    elif (board[1-1]==board[5-1] and board[1-1]==board[9-1] and board[1-1] ==mark):
+        return True
+    elif (board[3-1]==board[5-1] and board[3-1]==board[7-1] and board[3-1] ==mark):
+        return True
+    elif (board[1-1]==board[4-1] and board[1-1]==board[7-1] and board[1-1] ==mark):
+        return True
+    elif (board[2-1]==board[5-1] and board[2-1]==board[8-1] and board[2-1] ==mark):
+        return True
+    elif (board[3-1]==board[6-1] and board[3-1]==board[9-1] and board[3-1] ==mark):
+        return True
+    else:
+        return False
+
+def chkDraw():
+    for key in board.keys():
+        if (board[key]==' '):
+            return False
+    return True
+
+def insertLetter(letter, position):
+    if (spaceIsFree(position)):
+        board[position]=letter 
+        cells[position].innerText = letter 
+   
+        if (chkDraw()):
+            print('Draw!')
+            exit()
+        elif (chkForWin()):
+            if (letter=='X'):
+                print('Bot wins!')
+                exit()
+            else:
+                print('You win!')
+                exit()
+        return
+
+    else:
+        print('Position taken, please pick a different position.')
+        return
+
+player = 'O'
+bot ='X'
+
+
+def compMove():
+    bestScore=-1000 
+    bestMove=0
+    for key in board.keys(): 
+        if (board[key]==' '):
+            board[key]=bot
+            score = minimax(board, False) 
+            board[key] = ' ' 
+            if (score > bestScore):
+                bestScore = score
+                bestMove = key
+    insertLetter(bot, bestMove)
+    return
+
+def button_click(event):
+    col=event.target.id
+    position=int(col)
+    insertLetter(player, position)
+    compMove()
+    
+    
+def playerMove():
+    click_proxy = create_proxy(button_click)
+    gameBoard.addEventListener("click", click_proxy)
+  
+
+def minimax(board, isMaximizing):
+    if (chkMarkForWin(bot)):
+        return 1
+    elif (chkMarkForWin(player)):
+        return -1
+    elif (chkDraw()):
+        return 0
+    
+    if isMaximizing:
+        bestScore = -1000
+        
+        for key in board.keys():
+            if board[key]==' ':
+                board[key]=bot
+                score = minimax(board, False)
+                board[key]= ' '
+                if (score>bestScore):
+                    bestScore = score
+        return bestScore
+    else:
+        bestScore = 1000
+
+        for key in board.keys():
+            if board[key]==' ':
+                board[key]=player
+                score = minimax(board, True)
+                board[key]= ' '
+                if (score < bestScore):
+                    bestScore = score
+        return bestScore
+
+
+click_proxy = create_proxy(button_click)
+gameBoard.addEventListener("click", click_proxy)
+
+
+</py-script>
+      
+</body>
+</html>
